@@ -11,7 +11,6 @@ def grab_number(line, char)
 
   number = @input[line][first..last].to_i
   # puts "Grabbing #{number} on [#{char}, #{line}]"
-  @part_numbers << number
 
   # I don't know if the input contains any numbers that touch more than one
   # symbol, but as a precaution against double counting, we'll just null those
@@ -19,6 +18,8 @@ def grab_number(line, char)
   (first..last).each do |n|
     @input[line][n] = '.'
   end
+
+  return number
 end
 
 def mark_adjacent_numbers(line, char)
@@ -44,27 +45,34 @@ def mark_adjacent_numbers(line, char)
     char_range = (char - 1)..char
   end
 
+  numbers = []
+
   line_range.each do |line_no|
     char_range.each do |char_no|
-      grab_number(line_no, char_no) if DIGITS.any? { |d| d[@input[line_no][char_no]] }
+      numbers << grab_number(line_no, char_no) if DIGITS.any? { |d| d[@input[line_no][char_no]] }
     end
+  end
+
+  if numbers.length == 2
+    # puts "Adding gear ratio: #{numbers[0]} * #{numbers[1]} = #{numbers[0] * numbers[1]}"
+    @gear_ratios << numbers[0] * numbers[1]
   end
 end
 
 
 @input = ARGF.read.lines.map { |l| l.chomp }
-@part_numbers = []
+@gear_ratios = []
 
 NON_SYMBOLS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.']
 DIGITS      = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 @input.each.with_index do |line, line_no|
   line.chars.each.with_index do |char, char_no|
-    if NON_SYMBOLS.none? { |s| s[char] }
+    if char == '*'
       # puts "Looking around #{char} [#{char_no}, #{line_no}]"
       mark_adjacent_numbers(line_no, char_no)
     end
   end
 end
 
-puts "Part one: #{@part_numbers.sum}"
+puts "Part two: #{@gear_ratios.sum}"
