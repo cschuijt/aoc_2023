@@ -63,7 +63,6 @@ end
 @input = ARGF.read.lines.map { |l| l.chomp }
 @gear_ratios = []
 
-NON_SYMBOLS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.']
 DIGITS      = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 @input.each.with_index do |line, line_no|
