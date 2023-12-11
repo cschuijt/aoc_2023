@@ -42,6 +42,8 @@ while @positions.uniq.count > 1
   already_traversed.shift(traversed_size)
 end
 
+puts "Part 1: #{i}"
+
 part_of_loop.each do |part|
   @input[part[1]][part[0]] = @input_b[part[1]][part[0]]
 end
@@ -51,39 +53,41 @@ end
 @line_len  = @input[0].size
 @num_lines = @input.size
 
-def flood_fill(x, y)
-  @input[y][x] = 'x'
+def flood_fill(x, y, c)
+  @input[y][x] = c
 
   if x > 0 && @input[y][x - 1] == '.'
-    flood_fill(x - 1, y)
+    flood_fill(x - 1, y, c)
   end
 
   if x < @line_len - 1 && @input[y][x + 1] == '.'
-    flood_fill(x + 1, y)
+    flood_fill(x + 1, y, c)
   end
 
   if y > 0 && @input[y - 1][x] == '.'
-    flood_fill(x, y - 1)
+    flood_fill(x, y - 1, c)
   end
 
   if y < @num_lines - 1 && @input[y + 1][x] == '.'
-    flood_fill(x, y + 1)
+    flood_fill(x, y + 1, c)
   end
 end
 
-flood_fill(0, 0)
+@north_edge_coords = part_of_loop.reject { |c| ['-', '7', 'F'].include? @input_b[c[1]][c[0]] }
 
-corners = part_of_loop.reject { |c| @input_b[c[1]][c[0]] == '-' || @input_b[c[1]][c[0]] == '|' }
-potential_coords = []
-@input.each.with_index { |l, y| l.each.with_index { |c, x| potential_coords << [x, y] if c == '.' } }
-
-def inside_polygon(point, coords)
-  x = point[0]
-  y = point[1]
-
-  inside = false
-
-
-
-  return inside
+@input.each.with_index do |l, y|
+  l.each.with_index do |c, x|
+    if c == '.'
+      if @north_edge_coords.reject { |c| c[1] != y || c[0] > x }.size.odd?
+        flood_fill(x, y, 'I')
+      else
+        flood_fill(x, y, 'O')
+      end
+    end
+  end
 end
+
+count = 0
+@input.each { |l| l.each { |c| count = count + 1 if c == 'I' } }
+
+puts "Part two: #{count}"
